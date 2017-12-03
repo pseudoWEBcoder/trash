@@ -446,14 +446,31 @@ img {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"
           integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+          <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/css/jasny-bootstrap.min.css">
+
+
+
 </head>
 <body class="container">
-' . $body . '
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+' . $body . ';
+$(".fileinput").fileinput();
+$(document).on("mouseenter",".avatar",  function(){
+    var  that =  $(this),  oldhtml =  that[0].outerHTML;
+    that.html(placeholder);
+    $(document).on("click",  function(event){
+        if($(this).is(".avaror"))
+        return  false;
+        that[0].oldHTML =  oldhtml;
+        $(event).off(this)
+    })
+})
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"
-        integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+}</script>
+<script src = "https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
+<script src = "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"
+integrity = "sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin = "anonymous"></script>
+<script src = "//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/js/jasny-bootstrap.min.js"></script>
 </body>
 </html>';
         return $str;
@@ -462,48 +479,48 @@ img {
 
     public function renderForm($reply = null)
     {
-        return '             <div class="card-footer">
-             <form action="" method =  "POST">
-                    <div class="input-group">' .
-            (isset($this->chat->user['name']) ? ('<span class="input-group-addon" >' . $this->chat->user['name'] . '</span>') : '<input id="btn-input" type="text" name ="user"class="form-control input-sm chat_input" placeholder="nikname" />
-                        <input id="btn-input" type="password" name ="password"class="form-control input-sm chat_input" placeholder="пароль (запомнить)" title="введите пароль  и   потом   сможете авторизоваться (без  проверок и почт, просто введи  сюда пароль)" />') .
-            '<input id="btn-input" type="text" name ="text"class="form-control input-sm chat_input" placeholder="Write your message here..." />
-                        <span class="input-group-btn">
-                        <input type="submit" name="write" class="btn btn-primary btn-sm" id="btn-chat"/><i class="fa fa-send fa-1x" aria-hidden="true"></i></input>
-                        </span>
-                    </div>
-                    </form>
-                </div>';
+        return '             <div class = "card-footer">
+<form action = "" method = "POST">
+<div class = "input-group">' .
+            (isset($this->chat->user['name']) ? ('<span class = "input-group-addon" >' . $this->chat->user['name'] . '</span>') : '<input id = "btn-input" type = "text" name = "user"class = "form-control input-sm chat_input" placeholder = "nikname" />
+<input id = "btn-input" type = "password" name = "password"class = "form-control input-sm chat_input" placeholder = "пароль (запомнить)" title = "введите пароль  и   потом   сможете авторизоваться (без  проверок и почт, просто введи  сюда пароль)" />') .
+            '<input id = "btn-input" type = "text" name = "text"class = "form-control input-sm chat_input" placeholder = "Write your message here..." />
+<span class = "input-group-btn">
+<input type = "submit" name = "write" class = "btn btn-primary btn-sm" id = "btn-chat"/><i class = "fa fa-send fa-1x" aria-hidden = "true"></i></input>
+</span>
+</div>
+</form>
+</div>';
 
     }
 
     public function renderItem($item)
     {//https://bootsnipp.com/snippets/5MrA7
-        $avatar = ' <div class="col-md-2 col-xs-2 avatar">
-                            <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
-                        </div>';
+        $avatar = ' <div class = "col-md-2 col-xs-2 avatar">
+<img src = "http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class = " img-responsive ">
+</div>';
         if ($this->chat->user->id == $item['userid']) {
-            return ' <div class="row msg_container ' . ('base_sent') . '">' .
+            return ' <div class = "row msg_container ' . ('base_sent') . '">' .
                 $avatar .
-                '<div class="col-md-10 col-xs-10">
-                            <div class="messages msg_sent">
-                                <p>' . $item['message'] . '</p>
-                                <time datetime="2009-11-13T20:00">' . date('d.m.Y H:i:s', $item['timestamp']) . '</time>
-                            </div>
-                        </div>
-                       
-                    </div>';
+                '<div class = "col-md-10 col-xs-10">
+<div class = "messages msg_sent">
+<p>' . $item['message'] . '</p>
+<time datetime = "2009-11-13T20:00">' . date('d.m.Y H:i:s', $item['timestamp']) . '</time>
+</div>
+</div>
+
+</div>';
         } else {
-            return ' <div class="row msg_container ' . ('base_receive') . '">
-                        <div class="col-md-10 col-xs-10">
-                            <div class="messages msg_sent">
-                                <p>' . $item['message'] . '</p>
-                                <time datetime="2009-11-13T20:00">' . date('d.m.Y H:i:s', $item['timestamp']) . '</time>
-                            </div>
-                        </div>
-                        ' . $avatar . '
-                       
-                    </div>';
+            return ' <div class = "row msg_container ' . ('base_receive') . '">
+<div class = "col-md-10 col-xs-10">
+<div class = "messages msg_sent">
+<p>' . $item['message'] . '</p>
+<time datetime = "2009-11-13T20:00">' . date('d.m.Y H:i:s', $item['timestamp']) . '</time>
+</div>
+</div>
+' . $avatar . '
+
+</div>';
         }
 
     }
