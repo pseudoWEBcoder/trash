@@ -121,9 +121,9 @@ class Chat
         return $res;
     }
 
-    public function write($text, $reply)
+    public function write($text, $userid)
     {
-        return $this->insertCat($text, $reply);
+        return $this->insertCat($text, $userid);
 
     }
 
@@ -180,6 +180,16 @@ class Chat
         }
 
     }
+
+    public function updateUser($user, $password, $id)
+    {
+        $username = "'" . SQlite3::escapeString($user) . "'";
+
+        $exists = $this->select('users', '*', '(name=' . ($username) . ')');
+        if ($exists)
+            return false;
+        return $this->update('users', ['(id = ' . $this->user['id'] . ')'], ['name' => $user, 'pass' => $password]);
+    }
 }
 
 class View
@@ -201,16 +211,16 @@ class View
     {
         $rows = '';
         foreach ($users as $index => $item) {
-            $rows .= '<tr data-id="' . $item['name'] . '">
+            $rows .= '<tr data-id="' . $item['id'] . '">
 		                <td>' . ($index + 1) . '</td>
-		                <td>' . $item['name'] . '</td>
+		                <td>' . ($item['name'] ? $item['name'] : '<em>(not set)</em>') . '</td>
 		            </tr>';
         }
         return '            <div class="col-sm-4">
                   <div class="card text-white bg-white">
 		    <div class="card-heading top-bar  bg-primary">
                     <div class="col-md-8 col-xs-8">
-                        <h3 class="card-title"><span class="glyphicon glyphicon-book"></span> Contacts</h3>
+                        <h3 class="card-title"><span class="glyphicon glyphicon-book"></span> Online</h3>
                     </div>
                 </div>
 		    <table class="table table-striped table-hover">
@@ -454,29 +464,47 @@ img {
     {
         return '             <div class="card-footer">
              <form action="" method =  "POST">
-                    <div class="input-group">
-                        <input id="btn-input" type="text" name ="text"class="form-control input-sm chat_input" placeholder="Write your message here..." />
+                    <div class="input-group">' .
+            (isset($this->chat->user['name']) ? ('<span class="input-group-addon" >' . $this->chat->user['name'] . '</span>') : '<input id="btn-input" type="text" name ="user"class="form-control input-sm chat_input" placeholder="nikname" />
+                        <input id="btn-input" type="password" name ="password"class="form-control input-sm chat_input" placeholder="пароль (запомнить)" title="введите пароль  и   потом   сможете авторизоваться (без  проверок и почт, просто введи  сюда пароль)" />') .
+            '<input id="btn-input" type="text" name ="text"class="form-control input-sm chat_input" placeholder="Write your message here..." />
                         <span class="input-group-btn">
                         <input type="submit" name="write" class="btn btn-primary btn-sm" id="btn-chat"/><i class="fa fa-send fa-1x" aria-hidden="true"></i></input>
                         </span>
-                    </div></form>
+                    </div>
+                    </form>
                 </div>';
 
     }
 
     public function renderItem($item)
-    {//https://bootsnipp.com/snippets/featured/simple-chat
-        return ' <div class="row msg_container base_sent">
+    {//https://bootsnipp.com/snippets/5MrA7
+        $avatar = ' <div class="col-md-2 col-xs-2 avatar">
+                            <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+                        </div>';
+        if ($this->chat->user->id == $item['userid']) {
+            return ' <div class="row msg_container ' . ('base_sent') . '">' .
+                $avatar .
+                '<div class="col-md-10 col-xs-10">
+                            <div class="messages msg_sent">
+                                <p>' . $item['message'] . '</p>
+                                <time datetime="2009-11-13T20:00">' . date('d.m.Y H:i:s', $item['timestamp']) . '</time>
+                            </div>
+                        </div>
+                       
+                    </div>';
+        } else {
+            return ' <div class="row msg_container ' . ('base_receive') . '">
                         <div class="col-md-10 col-xs-10">
                             <div class="messages msg_sent">
                                 <p>' . $item['message'] . '</p>
                                 <time datetime="2009-11-13T20:00">' . date('d.m.Y H:i:s', $item['timestamp']) . '</time>
                             </div>
                         </div>
-                        <div class="col-md-2 col-xs-2 avatar">
-                            <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
-                        </div>
+                        ' . $avatar . '
+                       
                     </div>';
+        }
 
     }
 }
@@ -486,8 +514,11 @@ $chat = new Chat();
 $user = $chat->createUser();
 $view = new View('чат', $chat);
 
-echo $view->render($messages);
-if (isset($_REQUEST['write'])) {
-    $chat->write($_REQUEST['text'],  $user['id']);
+if (isset($_REQUEST['user'])) {
+    $chat->updateUser($_REQUEST['user'], $_REQUEST['password'], $user['id']);
 }
+if (isset($_REQUEST['write']) && !empty($_REQUEST['write'])) {
+    $chat->write($_REQUEST['text'], $user['id']);
+}
+echo $view->render();
 ?>
